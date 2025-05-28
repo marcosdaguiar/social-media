@@ -20,7 +20,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // load config routes
+const UserRoutes = require('./routes/user');
+const PostRoutes = require('./routes/post');
+const FollowRoutes = require('./routes/follow');
 
+app.use('/api/user', UserRoutes);
+app.use('/api/post', PostRoutes);
+app.use('/api/follow', FollowRoutes);
 
 // Test route
 app.get('/test', (req, res) => {
