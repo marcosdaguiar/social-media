@@ -2,10 +2,15 @@
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 
+//import services
+const jwtService = require("../services/jwt");
+const user = require("../models/user");
+
 // testing actions
 const testUser = (req, res) => {
   return res.status(200).json({
     message: "Message sent from User controller",
+    user: req.user, // user data from middleware
   });
 };
 
@@ -120,7 +125,7 @@ const loginUser = async (req, res) => {
         }
 
         // generate token (not implemented yet)
-        const token = false; // Placeholder for token generation logic
+        const token = jwtService.createToken(user); // Placeholder for token generation logic
         // );
         
         // Remove password from response
@@ -142,9 +147,40 @@ const loginUser = async (req, res) => {
     })
 }
 
+
+const profile = async (req, res) => {
+    try {
+        // Get user ID from URL parameter
+        const id = req.params.id;
+
+        // Find user by ID and exclude password and role fields
+        const userProfile = await User.findById(id).select('-password -role');
+
+        if (!userProfile) {
+            return res.status(404).json({
+                status: "error",
+                message: "User not found"
+            });
+        }
+
+        return res.status(200).json({
+            status: "success",
+            user: userProfile
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            status: "error",
+            message: "Error fetching user profile",
+            error: error.message
+        });
+    }
+};
+
 // Export the test function
 module.exports = {
   testUser,
   registerUser,
-  loginUser
+  loginUser,
+  profile
 };
