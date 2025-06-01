@@ -1,10 +1,13 @@
-const {Schema, model} = require('mongoose');
-const userSchema = new Schema({
+const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate-v2');
+
+const UserSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
     },
     surname: String,
+    bio: String,
     username: {
         type: String,
         required: true,
@@ -33,5 +36,6 @@ const userSchema = new Schema({
         default: Date.now
     }
 });
+UserSchema.plugin(mongoosePaginate);
 
-module.exports = model('User', userSchema, 'users'); // 'users' is the name of the collection in MongoDB
+module.exports = mongoose.model('User', UserSchema);
