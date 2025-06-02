@@ -1,11 +1,14 @@
-// Import required modules
-const User = require("../models/user");
+// Import required dependencies
 const bcrypt = require("bcrypt");
 const mongoosePaginate = require('mongoose-paginate-v2');
+const fs = require('fs');
+const path = require('path');
+
+// import User model
+const User = require("../models/user");
 
 //import services
 const jwtService = require("../services/jwt");
-const user = require("../models/user");
 
 // testing actions
 const testUser = (req, res) => {
@@ -221,6 +224,76 @@ const list = async (req, res) => {
     }
 };
 
+const uploadProfilePicture = async (req, res) => {
+    try {
+        // Get user ID from request
+        const userId = req.user.id;
+
+        // get file name from request
+        if (!req.file || !req.file.filename) {
+            return res.status(400).json({
+                status: "error",
+                message: "File not provided or invalid file format"
+            });
+        }
+        // validate file type
+        const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+        const fileExtension = req.file.filename.split('.').pop().toLowerCase();
+        if (!allowedExtensions.includes(fileExtension)) {
+            // If the file type is not allowed, delete the file and return an error
+            // delete file from server upload/profile_pictures
+            const fs = require('fs');
+            const filePath = `./uploads/profile_pictures/${req.file.filename}`;
+            fs.unlink(filePath, (err) => {
+                if (err) {
+                    console.error("Error deleting file:", err);
+                }
+            });
+            // Return error response
+            return res.status(400).json({
+                status: "error",
+                message: "Invalid file type. Allowed types are: jpg, jpeg, png, gif"
+            });
+        }
+        
+        // Check if file is provided
+        if (!req.file) {
+            return res.status(400).json({
+                status: "error",
+                message: "No file uploaded"
+            });
+        }
+        // Get file path
+        const filePath = req.file.path;
+        // Update user profile picture
+        const userUpdated = await User.findByIdAndUpdate(
+            userId,
+            { profilePicture: filePath },
+            { new: true }
+        ).select('-password -role');
+        // Check if user was found and updated
+        if (!userUpdated) {
+            return res.status(404).json({
+                status: "error",
+                message: "User not found"
+            });
+        }
+        // Return success response
+        return res.status(200).json({
+            status: "success",
+            message: "Profile picture updated successfully",
+            file: req.file,
+            user: userUpdated
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: "error", 
+            message: "Error updating profile picture",
+            error: error.message
+        });
+    } 
+};
+
 
 const updateUser = async (req, res) => {
     try {
@@ -291,6 +364,28 @@ const updateUser = async (req, res) => {
     }
 };
 
+const getProfilePicture = (req, res) => {
+    // Get file name from request parameters
+    const fileName = req.params.fileName;
+
+    // Construct the file path
+    const filePath = `./uploads/profile_pictures/${fileName}`;
+
+    // Check if the file exists
+    fs.stat(filePath, (error, exists) => {
+      if (!exists) {
+          return res.status(404).json({
+              status: "error",
+              message: "Profile picture not found"
+          });
+      }
+
+      // Send the file as a response
+      res.sendFile(path.resolve(filePath))
+      }); 
+};
+
+
 
 // Export the test function
 module.exports = {
@@ -299,5 +394,8 @@ module.exports = {
   loginUser,
   profile,
   list,
-  updateUser
+  updateUser,
+  uploadProfilePicture,
+  getProfilePicture
+  
 };
