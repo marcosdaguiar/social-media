@@ -26,8 +26,5 @@ router.put("/update", check.auth, UserController.updateUser);
 router.post("/upload-profile-picture", [check.auth, upload.single('file0')], UserController.uploadProfilePicture);
 router.get("/profile-picture/:fileName", check.auth, UserController.getProfilePicture);
 
-
-
-
 // Export the router
 module.exports = router;

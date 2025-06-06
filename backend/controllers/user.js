@@ -267,7 +267,7 @@ const uploadProfilePicture = async (req, res) => {
         const filePath = req.file.path;
         // Update user profile picture
         const userUpdated = await User.findByIdAndUpdate(
-            userId,
+            { _id: userId },
             { profilePicture: filePath },
             { new: true }
         ).select('-password -role');
@@ -309,8 +309,8 @@ const updateUser = async (req, res) => {
         // verify if user exists
         const users = await User.find({
             $or: [
-                { username: userToUpdate.username.toLowerCase() },
-                { email: userToUpdate.email.toLowerCase() },
+                { username: userToUpdate.username },
+                { email: userToUpdate.email },
             ],
         });
 
@@ -337,7 +337,7 @@ const updateUser = async (req, res) => {
         // Update user in database
         try {
             const userUpdated = await User.findByIdAndUpdate(
-                userIdentity.id,
+                {_id: userIdentity.id },
                 userToUpdate,
                 { new: true }
             ).select('-password -role');
