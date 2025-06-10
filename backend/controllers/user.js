@@ -9,6 +9,7 @@ const User = require("../models/user");
 
 //import services
 const jwtService = require("../services/jwt");
+const followService = require("../services/followService");
 
 // testing actions
 const testUser = (req, res) => {
@@ -165,9 +166,14 @@ const profile = async (req, res) => {
       });
     }
 
+    // Info of following and followers
+    const followInfo = await followService.followThisUser(req.user.id, id);
+
     return res.status(200).json({
       status: "success",
       user: userProfile,
+      following: followInfo.following,
+      followers: followInfo.followers,
     });
   } catch (error) {
     return res.status(500).json({
@@ -180,41 +186,44 @@ const profile = async (req, res) => {
 
 const list = async (req, res) => {
     try {
-        // Get page number from params or default to 1
-        let page = req.params.page ? parseInt(req.params.page) : 1;
+      // Get page number from params or default to 1
+      let page = req.params.page ? parseInt(req.params.page) : 1;
 
-        // Set options for pagination
-        const options = {
-            page: page,
-            limit: 5,
-            sort: { _id: 1 },
-            select: '-password -role'
-        };
+      // Set options for pagination
+      const options = {
+        page: page,
+        limit: 5,
+        sort: { _id: 1 },
+        select: "-password -role",
+      };
 
-        // Execute pagination
-        const users = await User.paginate({}, options);
+      // Execute pagination
+      const users = await User.paginate({}, options);
 
-        // Check if users exist
-        if (!users || users.totalDocs === 0) {
-            return res.status(404).json({
-                status: "error",
-                message: "No users found"
-            });
-        }
-
-        return res.status(200).json({
-            status: "success",
-            pagination: {
-                current: users.page,
-                previous: users.hasPrevPage ? users.prevPage : null,
-                next: users.hasNextPage ? users.nextPage : null,
-                total: users.totalDocs,
-                pages: users.totalPages,
-                itemsPerPage: users.limit
-            },
-            users: users.docs
+      // Check if users exist
+      if (!users || users.totalDocs === 0) {
+        return res.status(404).json({
+          status: "error",
+          message: "No users found",
         });
+      }
+      // get an array of ids of the users that are following the current user and the ones the current user is following
+      let followUserIds = await followService.followUserIds(req.user.id);
 
+      return res.status(200).json({
+        status: "success",
+        pagination: {
+          current: users.page,
+          previous: users.hasPrevPage ? users.prevPage : null,
+          next: users.hasNextPage ? users.nextPage : null,
+          total: users.totalDocs,
+          pages: users.totalPages,
+          itemsPerPage: users.limit,
+          user_following: followUserIds.following,
+          user_follow_me: followUserIds.followers
+        },
+        users: users.docs,
+      });
     } catch (error) {
         return res.status(500).json({
             status: "error",
