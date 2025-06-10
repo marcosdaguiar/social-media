@@ -1,6 +1,9 @@
 // import models
 const follow = require('../models/follow');
-const User = require('../models/user');
+const user = require('../models/user');
+
+// import services
+const followService = require('../services/followService')
 
 // import dependencies
 const mongoosePaginate = require ('mongoose-paginate-v2');
@@ -106,7 +109,7 @@ const unfollow = async (req, res) => {
 }
 
 
-
+// Get a list of users that the current user is following
 const following = async (req, res) => {
     try {
         // Get user ID from request
@@ -127,24 +130,24 @@ const following = async (req, res) => {
             {
                 page: page,
                 limit: itemsPerPage,
-                populate: { path: 'followed', select: 'name surname username' },
-                select: '-__v -user -_id'
+                populate: { path: 'following', select: 'name surname username' },
+                select: '-__v -user -_id -createdAt',
             }
-        );
+        )
+        
 
-        // Check if the user has no following
-        if (!follows || follows.docs.length === 0) {
-            return res.status(404).json({
-                status: 'error',
-                message: 'No following found'
-            });
-        }
-        // Return the list of following
+        // get an array of ids of the users that are following the current user and the ones the current user is following
+        let followUserIds = await followService.followUserIds(userId);
+
         return res.status(200).json({
             status: 'success',
+            userId: userId,
             follows: follows.docs,
             total: follows.totalDocs,
-            pages: follows.totalPages
+            pages: follows.totalPages,
+            user_following: followUserIds.following,
+            user_follow_me: followUserIds.followers
+
         });
 
     } catch (error) {
@@ -158,55 +161,49 @@ const following = async (req, res) => {
 
 // Get a list of followers for a user
 const followers = async (req, res) => {
-    // Get user ID from request
-    const userId = req.user.id;
-
-    // Get id from request parameters
-    const followedId = req.params.id;
-
-    // verify page parameter
-    const page = req.params.page ? parseInt(req.params.page) : 1;
-    // Define items per page
-    const itemsPerPage = 5;
-
-    // If followedId is not provided, use the current user's ID
-    const userToFollow = followedId || userId;
-
-    // Find a follow, get data of the user and paginate with mongoose-paginate-v2
-
-    // Get an array of ids of the users that are following the current user and the ones the current user is following
-
-    
-
-
-
-    
-    // Find all users that are following the current user
     try {
-        const follows = await follow.find({ followed: userToFollow })
-            .populate('user', 'name surname _id image')
-            .paginate(page, itemsPerPage);
+        // Get user ID from request
+        let userId = req.user.id;
 
-        // Check if the user has no followers
-        if (!follows || follows.length === 0) {
-            return res.status(404).json({
-                status: 'error',
-                message: 'No followers found'
-            });
-        }
+        // verify if the user ID is provided in the request parameters
+        if (req.params.id) userId = req.params.id;
+        
+        // verify page parameter
+        let page = req.params.page ? parseInt(req.params.page) : 1;
+        
+        // Define items per page
+        const itemsPerPage = 5;
 
-        // Return the list of followers
+        // Find follows and populate user details
+        const follows = await follow.paginate(
+            { following: userId },
+            {
+                page: page,
+                limit: itemsPerPage,
+                populate: { path: 'user', select: 'name surname username' },
+                select: '-__v -user -_id -createdAt -following',
+            }
+        );
+
+        // get an array of ids of the users that are following the current user and the ones the current user is following
+        let followUserIds = await followService.followUserIds(userId);
+
         return res.status(200).json({
             status: 'success',
-            follows,
-            total: follows.total,
-            pages: Math.ceil(follows.total / itemsPerPage)
+            message: 'Followers retrieved successfully',
+            userId: userId,
+            //follows: follows.docs, // The list of followers
+            followers: follows.docs,
+            total: follows.totalDocs,
+            pages: follows.totalPages,
+            user_following: followUserIds.following,
+            user_follow_me: followUserIds.followers
         });
 
     } catch (error) {
         return res.status(500).json({
             status: 'error',
-            message: 'Error retrieving followers',
+            message: 'Error retrieving following list',
             error: error.message
         });
     }
