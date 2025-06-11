@@ -6,8 +6,7 @@ const check = require('../middlewares/auth');
 //Define routes for follow operations
 router.get("/following/:id/:page", check.auth, FollowController.following);
 router.get("/following/:id", check.auth, FollowController.following);
-router.get("/followers/:id/:page", check.auth, FollowController.followers);
-router.get("/followers/:id", check.auth, FollowController.followers);
+router.get("/followers/:id/{:page}", check.auth, FollowController.followers);
 router.post("/save", check.auth, FollowController.save);
 router.delete("/unfollow/:id", check.auth, FollowController.unfollow);
 
