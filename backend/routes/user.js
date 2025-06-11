@@ -20,11 +20,11 @@ router.get("/user-test", check.auth, UserController.testUser);
 router.post("/register", UserController.registerUser);
 router.post("/login", UserController.loginUser);
 router.get("/profile/:id", check.auth, UserController.profile);
-router.get("/list", check.auth, UserController.list);
-router.get("/list/:page", check.auth, UserController.list);
+router.get("/list/{:page}", check.auth, UserController.list);
 router.put("/update", check.auth, UserController.updateUser);
 router.post("/upload-profile-picture", [check.auth, upload.single('file0')], UserController.uploadProfilePicture);
-router.get("/profile-picture/:fileName", check.auth, UserController.getProfilePicture);
+router.get("/profile-picture/:fileName", UserController.getProfilePicture);
+router.get("/counter/:id", check.auth, UserController.counter);
 
 // Export the router
 module.exports = router;

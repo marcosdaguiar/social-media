@@ -10,6 +10,9 @@ const User = require("../models/user");
 //import services
 const jwtService = require("../services/jwt");
 const followService = require("../services/followService");
+const Follow = require("../models/follow");
+const Post = require("../models/post");
+const e = require("express");
 
 // testing actions
 const testUser = (req, res) => {
@@ -194,7 +197,7 @@ const list = async (req, res) => {
         page: page,
         limit: 5,
         sort: { _id: 1 },
-        select: "-password -role",
+        select: "-password -role -__v -email", // Exclude password, role, and version key
       };
 
       // Execute pagination
@@ -342,6 +345,10 @@ const updateUser = async (req, res) => {
             const pwd = await bcrypt.hash(userToUpdate.password, 10);
             userToUpdate.password = pwd;
         }
+        else {
+            // If password is not provided, remove it from the object
+            delete userToUpdate.password;
+        }
 
         // Update user in database
         try {
@@ -394,6 +401,36 @@ const getProfilePicture = (req, res) => {
       }); 
 };
 
+const counter = async (req, res) => {
+        // Get user ID from request
+        let userId = req.user.id;
+
+        // Get user by ID and select only the necessary fields
+        if (req.params.id) {
+            userId = req.params.id;
+        }
+
+        try{
+          const followingCount = await Follow.countDocuments({'user': userId});
+          const followerCount = await Follow.countDocuments({'following': userId});
+          const postCount = await Post.countDocuments({'user': userId});
+
+          // Return the counts
+          return res.status(200).json({
+              status: "success",
+              following: followingCount,
+              followers: followerCount,
+              posts: postCount
+          });
+        }catch (error) {
+          return res.status(500).json({
+              status: "error",
+              message: "Error fetching user data",
+              error: error.message
+          });
+      }
+};
+
 
 
 // Export the test function
@@ -405,6 +442,6 @@ module.exports = {
   list,
   updateUser,
   uploadProfilePicture,
-  getProfilePicture
-  
+  getProfilePicture,
+  counter
 };

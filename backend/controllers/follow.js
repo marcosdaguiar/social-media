@@ -44,9 +44,9 @@ const save = async (req, res) => {
             });
         }
         return res.status(200).json({
-        status: 'success',
-        userId,
-        follow: followStored,
+            status: 'success',
+            userId,
+            follow: followStored,
         });
 
     } catch (error) {
