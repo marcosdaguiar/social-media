@@ -5,22 +5,26 @@ import { Login } from '../components/user/Login'
 import { Register } from '../components/user/Register'
 import { PrivateLayout } from '../components/layout/private/PrivateLayout';
 import { Feed } from '../components/post/Feed'
+import { AuthProvider } from '../context/AuthProvider'
+import { Logout } from '../components/user/Logout'
 
 export const Routing = () => {
   return (
 
     <BrowserRouter>
-        <Routes>
+      <AuthProvider>
+          <Routes>
             <Route path= "/" element={<PublicLayout />}>
-                <Route index element={<Login />} />
-                <Route path="login" element={<Login />} />
-                <Route path="register" element={<Register />} />
+              <Route index element={<Login />} />
+              <Route path="login" element={<Login />} />
+              <Route path="register" element={<Register />} />
             </Route>
 
             <Route path="/social" element={<PrivateLayout />}>
-                <Route index element={<Feed />} />
-                <Route path="feed" element={<Feed />} />
-                {/* Add more private routes here */}
+              <Route index element={<Feed />} />
+              <Route path="feed" element={<Feed />} />
+              <Route path="logout" element={<Logout />} />
+              {/* Add more private routes here */}
             </Route>
 
             <Route path="*" element={
@@ -30,11 +34,9 @@ export const Routing = () => {
                   <Link to="/">Back to main</Link>
                 </p>
               </>
-            }
-            />
-
+            }/>
         </Routes>
-    
+      </AuthProvider>
     </BrowserRouter>
   )
 }

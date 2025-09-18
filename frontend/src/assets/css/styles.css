@@ -1,4 +1,4 @@
-/*ESTILOS GENERALES*/
+/*GENERAL STYLES*/
 :root {
     --color-general-text: #333;
     --color-backgroud-navbar: #3785e5;
@@ -66,7 +66,7 @@ body {
 }
 
 
-/*ESTILOS NAVBAR*/
+/*NAVBAR STYLES*/
 .layout__navbar{
     width: 100%;
     grid-area: nav;
@@ -88,7 +88,7 @@ body {
 }
 
 .navbar__container-lists{
-    width: 95%;
+    width: 90%;
     display: flex;
     justify-content: space-between;
     padding-left: 1.5rem;
@@ -134,9 +134,10 @@ body {
 
 .list-end__name{
     padding: 0.5rem;
+    margin-right: 30px;
 }
 
-/*ESTILOS DE CONTENIDO*/
+/*CONTENT STYLE*/
 .layout__content{
     grid-area: content;
     padding: 0 1.5rem;
@@ -276,7 +277,7 @@ body {
     font-size: 1.4rem;
 }
 
-/*ESTILOS BARRA LATERAL*/
+/*SIDEBAR STYLES*/
 .layout__aside{
     grid-area: aside;
     margin-right: 2rem;
