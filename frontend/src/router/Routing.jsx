@@ -7,6 +7,8 @@ import { PrivateLayout } from '../components/layout/private/PrivateLayout';
 import { Feed } from '../components/post/Feed'
 import { AuthProvider } from '../context/AuthProvider'
 import { Logout } from '../components/user/Logout'
+import { People } from '../components/user/People'
+import { Config } from '../components/user/Config'
 
 export const Routing = () => {
   return (
@@ -23,7 +25,9 @@ export const Routing = () => {
             <Route path="/social" element={<PrivateLayout />}>
               <Route index element={<Feed />} />
               <Route path="feed" element={<Feed />} />
+              <Route path="people" element={<People />} />
               <Route path="logout" element={<Logout />} />
+              <Route path="settings" element={<Config />} />
               {/* Add more private routes here */}
             </Route>
 

@@ -240,6 +240,7 @@ const uploadProfilePicture = async (req, res) => {
     try {
         // Get user ID from request
         const userId = req.user.id;
+        console.log("User ID:", userId);
 
         // get file name from request
         if (!req.file || !req.file.filename) {
@@ -256,6 +257,7 @@ const uploadProfilePicture = async (req, res) => {
             // delete file from server upload/profile_pictures
             const fs = require('fs');
             const filePath = `./uploads/profile_pictures/${req.file.filename}`;
+;
             fs.unlink(filePath, (err) => {
                 if (err) {
                     console.error("Error deleting file:", err);
@@ -280,7 +282,7 @@ const uploadProfilePicture = async (req, res) => {
         // Update user profile picture
         const userUpdated = await User.findByIdAndUpdate(
             { _id: userId },
-            { profilePicture: filePath },
+            { profilePicture: req.file.filename },
             { new: true }
         ).select('-password -role');
         // Check if user was found and updated
@@ -386,6 +388,8 @@ const getProfilePicture = (req, res) => {
 
     // Construct the file path
     const filePath = `./uploads/profile_pictures/${fileName}`;
+    //const filePath = `${fileName}`;
+    console.log("Sending file:", path.resolve(filePath));
 
     // Check if the file exists
     fs.stat(filePath, (error, exists) => {
@@ -397,6 +401,7 @@ const getProfilePicture = (req, res) => {
       }
 
       // Send the file as a response
+      
       res.sendFile(path.resolve(filePath))
       }); 
 };
