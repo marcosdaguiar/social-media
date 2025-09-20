@@ -122,6 +122,12 @@ body {
     padding: 0.6rem;
 }
 
+.list-end__item img{
+    object-fit: cover;       /* scales and crops */
+    object-position: center; /* centers the crop */
+    display: block;          /* removes default gaps */
+}
+
 .list-end__img{
     width: 4rem;
     height: 4rem;
@@ -220,6 +226,13 @@ body {
     border-radius: 3.2rem;
 }
 
+
+.post__image-user img{
+    object-fit: cover;       /* scales and crops */
+    object-position: center; /* centers the crop */
+    display: block;          /* removes default gaps */
+}
+
 .post__user-info{
     margin-top: 1rem;
 }
@@ -253,12 +266,20 @@ body {
     border-color: var(--color-border-btn-delete);
 }
 
+.post__button--green{
+    background-color: var(--color-background-btn-success);
+    border-color: var(--color-border-btn-success);
+    margin-right: 1rem;
+}
 
 .post__button:hover{
     background-color: var(--color-background-btn-delete-hover);
     border-color: var(--color-border-btn-delete-hover);
 }
-
+.post__button--green:hover{
+    background-color: var(--color-background-btn-success-hover);
+    border-color: var(--color-border-btn-success-hover);
+}
 .content__container-btn{
     width: 100%;
     display: flex;
@@ -313,6 +334,16 @@ body {
 .container-avatar__img{
     height: 100%;
 }
+
+
+.general-info__container-avatar img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;       /* scales and crops */
+    object-position: center; /* centers the crop */
+    display: block;          /* removes default gaps */
+}
+
 
 .container-names__name{
     color: var( --color-text-black);

@@ -21,12 +21,9 @@ export const Sidebar = () => {
                 <div className="aside__profile-info">
 
                     <div className="profile-info__general-info">
-                        <div className="general-info__container-avatar">
-                            {auth.profilePicture != "default.png" && <img src={Global.url+ "user/profile-picture/" +auth.profilePicture} className="container-avatar__img" alt="Foto de perfil"/>
-                            }
-                            {auth.profilePicture == "default.png" &&
-                            <img src={ avatar } className="container-avatar__img" alt="Profile Picture"/>
-                            }
+                        <div className="general-info__container-avatar" style={{ backgroundImage: `url(${Global.url+ "user/profile-picture/" +auth.profilePicture})` }}>
+                            {auth.profilePicture != "default.png" && <img src={Global.url+ "user/profile-picture/" +auth.profilePicture} className="container-avatar__img" alt="Profile Picture"/>}
+                            {auth.profilePicture == "default.png" && <img src={ avatar } className="container-avatar__img" alt="Profile Picture"/>}
                         </div>
 
                         <div className="general-info__container-names">
