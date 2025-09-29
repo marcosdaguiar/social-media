@@ -220,7 +220,6 @@ const list = async (req, res) => {
           previous: users.hasPrevPage ? users.prevPage : null,
           next: users.hasNextPage ? users.nextPage : null,
           total: users.totalDocs,
-          pages: users.totalPages,
           itemsPerPage: users.limit,
           user_following: followUserIds.following,
           user_follow_me: followUserIds.followers
