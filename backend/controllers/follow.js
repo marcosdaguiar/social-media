@@ -30,7 +30,7 @@ const save = async (req, res) => {
     let userToFollow = new follow(
         {
             user: userId.id, // The user who is following
-            followed: params.followed // The user being followed
+            following: params.followed // The user being followed
         }
     );
 
@@ -46,7 +46,7 @@ const save = async (req, res) => {
         return res.status(200).json({
             status: 'success',
             userId,
-            follow: followStored,
+            follow: followStored
         });
 
     } catch (error) {
@@ -81,7 +81,7 @@ const unfollow = async (req, res) => {
     try {
         const followDeleted = await follow.findOneAndDelete({
             user: userId,
-            followed: followedId
+            following: followedId
         });
 
         // Check if the follow relationship was found and deleted
@@ -96,7 +96,7 @@ const unfollow = async (req, res) => {
         return res.status(200).json({
             status: 'success',
             message: 'Unfollowed successfully',
-            follow: followDeleted
+            following: followDeleted
         });
 
     } catch (error) {
@@ -142,7 +142,7 @@ const following = async (req, res) => {
         return res.status(200).json({
             status: 'success',
             userId: userId,
-            follows: follows.docs,
+            following: follows.docs,
             total: follows.totalDocs,
             pages: follows.totalPages,
             user_following: followUserIds.following,
