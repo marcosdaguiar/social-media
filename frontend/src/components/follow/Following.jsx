@@ -1,23 +1,31 @@
 import React, { useEffect, useState } from 'react'
 import { Global } from '../../helpers/Global'
-import { UserList } from './UserList'
+import { UserList } from '../user/UserList'
+import { useParams } from 'react-router-dom'
 
-export const People = () => {
+export const Following = () => {
   const [users, setUsers] = useState([])
   const [page, setPage] = useState(1)
   const [more, setMore] = useState(true)
   const [following, setFollowing] = useState([])
   const [loading, setLoading] = useState(true)
+
+  const params = useParams();
+
   let next = page + 1
   useEffect(() => {
-    getUsers(1)
+    getUsers(page)
   }, [])
-
 
   const getUsers = async (nextPage = 1) => {
     //loading state
     setLoading(true)
-    let url1 = Global.url + "user/list/" + nextPage
+
+    // get userId from url
+    const userId = params.userId;
+
+
+    let url1 = Global.url + "follow/following/" + userId + "/" + nextPage
 
     // peticion para sacar usuarios
     const request = await fetch(url1, {
@@ -29,45 +37,47 @@ export const People = () => {
     })
 
     const data = await request.json()
+    let cleanUsers = []
+    data.following.forEach(following => {
+      cleanUsers = [...cleanUsers, following.following]
+    }
+    )
     setLoading(false)
 
-
     // create a state to list users
-    if (data.status == "success" && data.users) {
-      let newUsers = data.users
+    if (data.status == "success" && data.following) {
+      let newUsers = cleanUsers
 
       if (users.length >= 1) {
-        newUsers = [...users, ...data.users]
+        newUsers = [...users, ...data.following]
       }
       setUsers(newUsers)
-      setFollowing(data.pagination.user_following)
+      setFollowing(data.user_following)
       setLoading(false)
     }
 
-    // pagination to load more users
+    //pagination to load more users
 
-    if (page >= data.pagination.next) {
+    if (nextPage >= data.pages) {
       setMore(false)
     }
+    
   }
-  
+
   return (
     <>
-    <div>
-      
-    </div>
       <header className="content__header">
-        <h1 className="content__title">People</h1>
+        <h1 className="content__title">Following Users "username" </h1>
       </header>
-      <UserList users={users} 
-                getUsers={getUsers} 
-                following={following} 
-                setFollowing={setFollowing}
-                more={more}
-                loading={loading}
-                setPage={setPage}
-                next={next}
-       />
+      <UserList users={users}
+        getUsers={getUsers}
+        following={following}
+        setFollowing={setFollowing}
+        more={more}
+        loading={loading}
+        setPage={setPage}
+        next={next}
+      />
     </>
   )
 }

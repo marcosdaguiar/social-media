@@ -124,17 +124,30 @@ const following = async (req, res) => {
         // Define items per page
         const itemsPerPage = 5;
 
+        console.log("userId", userId)
+
         // Find follows and populate user details
         const follows = await follow.paginate(
             { user: userId },
             {
                 page: page,
                 limit: itemsPerPage,
-                populate: { path: 'following', select: 'name surname username' },
-                select: '-__v -user -_id -createdAt',
+                populate: { path: 'following', select: 'name surname username profilePicture createdAt biography ' },
+                select: '-__v -user -_id',
             }
         )
         
+        // debug: print the paginate result and the docs to inspect structure
+        try {
+            // Print a compact JSON representation
+            console.log('DEBUG follows (raw):', follows)
+            // Print stringified with indentation for easier reading
+            console.log('DEBUG follows (json):', JSON.stringify(follows, null, 2))
+            // Print only the docs array shape
+            console.log('DEBUG follows.docs (json):', JSON.stringify(follows.docs, null, 2))
+        } catch (e) {
+            console.log('DEBUG follows: unable to stringify follows object', e.message)
+        }
 
         // get an array of ids of the users that are following the current user and the ones the current user is following
         let followUserIds = await followService.followUserIds(userId);
@@ -180,8 +193,8 @@ const followers = async (req, res) => {
             {
                 page: page,
                 limit: itemsPerPage,
-                populate: { path: 'user', select: 'name surname username' },
-                select: '-__v -user -_id -createdAt -following',
+                populate: { path: 'user', select: 'name surname username profilePicture createdAt biography' },
+                select: '-__v -user -_id -following',
             }
         );
 

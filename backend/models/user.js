@@ -7,7 +7,7 @@ const UserSchema = new Schema({
         required: true,
     },
     surname: String,
-    bio: String,
+    biography: String,
     username: {
         type: String,
         required: true,
